@@ -11,29 +11,40 @@ function KeySystem.new(Config, Filename, func)
 		return
 	end
 
-	local wsCtor = (WebSocket and WebSocket.connect)
-		or (syn and syn.websocket and syn.websocket.connect)
-		or (websocket and websocket.connect)
+	local wsCtor
+	local ws
+	local ctors = {
+		WebSocket and WebSocket.connect,
+		syn and syn.websocket and syn.websocket.connect,
+		websocket and websocket.connect
+	}
+	for _, ctor in ipairs(ctors) do
+		if typeof(ctor) == "function" then
+			local success, res = pcall(ctor, "wss://secure.pandauth.com/ws?type=wilkins-lib")
+			if success and typeof(res) == "table" and res.OnMessage then
+				wsCtor = ctor
+				ws = res
+				break
+			end
+		end
+	end
 
-	if not wsCtor then
-		warn("[PandaUI] Your executor does not support WebSocket.")
+	if not wsCtor or not ws then
+		warn("[PandaUI] Your executor does not support WebSocket or connection failed.")
 		func(false)
 		return
 	end
 
 	local libCode
 	do
-		local ws = wsCtor("wss://secure.pandauth.com/ws?type=wilkins-lib")
-		if ws then
-			ws.OnMessage:Connect(function(msg)
-				if msg and #msg > 0 and not libCode then
-					libCode = msg
-				end
-			end)
-			local deadline = tick() + 15
-			repeat task.wait(0.05) until libCode or tick() > deadline
-			pcall(function() ws:Close() end)
-		end
+		ws.OnMessage:Connect(function(msg)
+			if msg and #msg > 0 and not libCode then
+				libCode = msg
+			end
+		end)
+		local deadline = tick() + 15
+		repeat task.wait(0.05) until libCode or tick() > deadline
+		pcall(function() ws:Close() end)
 	end
 
 	if not libCode then
@@ -75,7 +86,7 @@ function KeySystem.new(Config, Filename, func)
 					task.wait(5)
 				end
 			end)
-			func(true)
+			func(true, result)
 			return
 		else
 			Wilkins.clearSavedKey()
@@ -304,7 +315,7 @@ function KeySystem.new(Config, Filename, func)
 				end
 			end)
 			task.wait(0.4)
-			func(true)
+			func(true, result)
 		else
 			Wilkins.clearSavedKey()
 			Config.PandaUI:Notify({

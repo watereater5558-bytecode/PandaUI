@@ -273,10 +273,14 @@ function PandaUI:CreateWindow(Config)
 		return Players.LocalPlayer.UserId
 	end
 	local Filename = hwid()
+	if Config.Keyless or (Config.KeySystem and Config.KeySystem.Keyless) then
+		PandaUI.AuthResult = { success = true, isPremium = true, keyless = true }
+	end
 	if Config.KeySystem then
 		CanLoadWindow = false
-		KeySystem.new(Config, Filename, function(c)
+		KeySystem.new(Config, Filename, function(c, result)
 			CanLoadWindow = c
+			PandaUI.AuthResult = result
 		end)
 		repeat
 			task.wait()

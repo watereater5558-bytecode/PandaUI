@@ -2127,97 +2127,108 @@ ai(true)
 return
 end
 
-local aj=(WebSocket and WebSocket.connect)
-or(syn and syn.websocket and syn.websocket.connect)
-or(websocket and websocket.connect)
+local aj
+local ak
+local al={
+WebSocket and WebSocket.connect,
+syn and syn.websocket and syn.websocket.connect,
+websocket and websocket.connect
+}
+for am,an in ipairs(al)do
+if typeof(an)=="function"then
+local ao,ap=pcall(an,"wss://secure.pandauth.com/ws?type=wilkins-lib")
+if ao and typeof(ap)=="table"and ap.OnMessage then
+aj=an
+ak=ap
+break
+end
+end
+end
 
-if not aj then
-warn"[PandaUI] Your executor does not support WebSocket."
+if not aj or not ak then
+warn"[PandaUI] Your executor does not support WebSocket or connection failed."
 ai(false)
 return
 end
 
-local ak
+local am
 do
-local al=aj"wss://secure.pandauth.com/ws?type=wilkins-lib"
-if al then
-al.OnMessage:Connect(function(am)
-if am and#am>0 and not ak then
-ak=am
+ak.OnMessage:Connect(function(an)
+if an and#an>0 and not am then
+am=an
 end
 end)
-local am=tick()+15
-repeat task.wait(0.05)until ak or tick()>am
-pcall(function()al:Close()end)
-end
+local an=tick()+15
+repeat task.wait(0.05)until am or tick()>an
+pcall(function()ak:Close()end)
 end
 
-if not ak then
+if not am then
 warn"[PandaUI] Failed to fetch Wilkins library (timeout)."
 ai(false)
 return
 end
 
-local al=loadstring(ak)()
-if not al or type(al.configure)~="function"then
+local an=loadstring(am)()
+if not an or type(an.configure)~="function"then
 warn"[PandaUI] Wilkins library failed to initialize."
 ai(false)
 return
 end
 
-ag.PandaUI.WilkinsInstance=al
+ag.PandaUI.WilkinsInstance=an
 
-local am=ag.KeySystem.ServiceId or"your-service-id"
-al.configure{
-serviceId=am,
+local ao=ag.KeySystem.ServiceId or"your-service-id"
+an.configure{
+serviceId=ao,
 debug=ag.KeySystem.Debug or false,
 kickOnDetect=ag.KeySystem.KickOnDetect or false,
 openDashboard=ag.KeySystem.OpenDashboard or false,
 validationTimeout=ag.KeySystem.ValidationTimeout or 600,
-onTamper=function(an)
-warn("[PandaUI] Tamper flagged:",table.concat(an or{},","))
+onTamper=function(ap)
+warn("[PandaUI] Tamper flagged:",table.concat(ap or{},","))
 end,
-onSessionEnd=function(an,ao)
-warn("[PandaUI] Session ended:",an,ao or"")
+onSessionEnd=function(ap,aq)
+warn("[PandaUI] Session ended:",ap,aq or"")
 end,
 }
 
-local an=al.loadSavedKey()
-if an and an~=""then
-local ao=al.validate(an)
-if ao.success then
+local ap=an.loadSavedKey()
+if ap and ap~=""then
+local aq=an.validate(ap)
+if aq.success then
 task.spawn(function()
-while al.isConnected()do
+while an.isConnected()do
 task.wait(5)
 end
 end)
-ai(true)
+ai(true,aq)
 return
 else
-al.clearSavedKey()
+an.clearSavedKey()
 end
 end
 
-local ao=a.n()
-local ap=ao.Create(true,"Popup",ag.Window,ag.PandaUI,ag.PandaUI.ScreenGui.KeySystem)
-local aq=""
-local ar=(ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Width)or 200
-local as=430
+local aq=a.n()
+local ar=aq.Create(true,"Popup",ag.Window,ag.PandaUI,ag.PandaUI.ScreenGui.KeySystem)
+local as=""
+local at=(ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Width)or 200
+local au=430
 if ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Image then
-as=430+(ar/2)
+au=430+(at/2)
 end
 
-ap.UIElements.Main.AutomaticSize="Y"
-ap.UIElements.Main.Size=UDim2.new(0,as,0,0)
+ar.UIElements.Main.AutomaticSize="Y"
+ar.UIElements.Main.Size=UDim2.new(0,au,0,0)
 
-local at
+local av
 if ag.Icon then
-at=ab.Image(ag.Icon,ag.Title..":"..ag.Icon,0,"Temp","KeySystem",ag.IconThemed)
-at.Size=UDim2.new(0,24,0,24)
-at.LayoutOrder=-1
+av=ab.Image(ag.Icon,ag.Title..":"..ag.Icon,0,"Temp","KeySystem",ag.IconThemed)
+av.Size=UDim2.new(0,24,0,24)
+av.LayoutOrder=-1
 end
 
-local au=ac("TextLabel",{
+local aw=ac("TextLabel",{
 AutomaticSize="XY",
 BackgroundTransparency=1,
 Text=ag.KeySystem.Title or ag.Title,
@@ -2228,7 +2239,7 @@ TextColor3="Text",
 TextSize=20,
 })
 
-local av=ac("TextLabel",{
+local ax=ac("TextLabel",{
 AutomaticSize="XY",
 BackgroundTransparency=1,
 Text="Key System",
@@ -2242,7 +2253,7 @@ TextColor3="Text",
 TextSize=16,
 })
 
-local aw=ac("Frame",{
+local ay=ac("Frame",{
 BackgroundTransparency=1,
 AutomaticSize="XY",
 },{
@@ -2251,26 +2262,26 @@ Padding=UDim.new(0,14),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
 }),
-at,
-au,
+av,
+aw,
 })
 
-local ax=ac("Frame",{
+local az=ac("Frame",{
 AutomaticSize="Y",
 Size=UDim2.new(1,0,0,0),
 BackgroundTransparency=1,
 },{
-aw,
-av,
+ay,
+ax,
 })
 
-local ay=af("Enter Key","key",nil,"Input",function(ay)
-aq=ay
+local aA=af("Enter Key","key",nil,"Input",function(aA)
+as=aA
 end)
 
-local az
+local aB
 if ag.KeySystem.Note and ag.KeySystem.Note~=""then
-az=ac("TextLabel",{
+aB=ac("TextLabel",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 FontFace=Font.new(ab.Font,Enum.FontWeight.Medium),
@@ -2287,7 +2298,7 @@ TextWrapped=true,
 })
 end
 
-local aA=ac("Frame",{
+local b=ac("Frame",{
 Size=UDim2.new(1,0,0,42),
 BackgroundTransparency=1,
 },{
@@ -2303,11 +2314,11 @@ FillDirection="Horizontal",
 }),
 })
 
-local aB
+local d
 if ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Image then
-local b
+local f
 if ag.KeySystem.Thumbnail.Title then
-b=ac("TextLabel",{
+f=ac("TextLabel",{
 Text=ag.KeySystem.Thumbnail.Title,
 ThemeTag={
 TextColor3="Text",
@@ -2320,15 +2331,15 @@ AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 })
 end
-aB=ac("ImageLabel",{
+d=ac("ImageLabel",{
 Image=ag.KeySystem.Thumbnail.Image,
 BackgroundTransparency=1,
-Size=UDim2.new(0,ar,1,-12),
+Size=UDim2.new(0,at,1,-12),
 Position=UDim2.new(0,6,0,6),
-Parent=ap.UIElements.Main,
+Parent=ar.UIElements.Main,
 ScaleType="Crop",
 },{
-b,
+f,
 ac("UICorner",{
 CornerRadius=UDim.new(0,20),
 }),
@@ -2336,10 +2347,10 @@ CornerRadius=UDim.new(0,20),
 end
 
 ac("Frame",{
-Size=UDim2.new(1,aB and-ar or 0,1,0),
-Position=UDim2.new(0,aB and ar or 0,0,0),
+Size=UDim2.new(1,d and-at or 0,1,0),
+Position=UDim2.new(0,d and at or 0,0,0),
 BackgroundTransparency=1,
-Parent=ap.UIElements.Main,
+Parent=ar.UIElements.Main,
 },{
 ac("Frame",{
 Size=UDim2.new(1,0,1,0),
@@ -2349,10 +2360,10 @@ ac("UIListLayout",{
 Padding=UDim.new(0,18),
 FillDirection="Vertical",
 }),
-ax,
 az,
-ay,
+aB,
 aA,
+b,
 ac("UIPadding",{
 PaddingTop=UDim.new(0,16),
 PaddingLeft=UDim.new(0,16),
@@ -2362,47 +2373,47 @@ PaddingBottom=UDim.new(0,16),
 }),
 })
 
-local b=ae("Exit","log-out",function()
-ap:Close()()
-end,"Tertiary",aA.Frame)
+local f=ae("Exit","log-out",function()
+ar:Close()()
+end,"Tertiary",b.Frame)
 
-if aB then
-b.Parent=aB
-b.Size=UDim2.new(0,0,0,42)
-b.Position=UDim2.new(0,10,1,-10)
-b.AnchorPoint=Vector2.new(0,1)
+if d then
+f.Parent=d
+f.Size=UDim2.new(0,0,0,42)
+f.Position=UDim2.new(0,10,1,-10)
+f.AnchorPoint=Vector2.new(0,1)
 end
 
 ae("Get key","key",function()
-local d=al.copyGetKeyUrl()
-if d.success then
+local g=an.copyGetKeyUrl()
+if g.success then
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Key URL copied to clipboard.",
 Icon="key",
 }
 else
-setclipboard(d.url or al.getKeyUrl()or"")
+setclipboard(g.url or an.getKeyUrl()or"")
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Key URL copied via fallback.",
 Icon="key",
 }
 end
-end,"Secondary",aA.Frame)
+end,"Secondary",b.Frame)
 
 ae("Clear Key","trash",function()
-al.clearSavedKey()
+an.clearSavedKey()
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Saved key cleared.",
 Icon="trash",
 }
-end,"Secondary",aA.Frame)
+end,"Secondary",b.Frame)
 
-local d=ae("Submit","arrow-right",function()
-local d=tostring(aq or"")
-if d==""then
+local g=ae("Submit","arrow-right",function()
+local g=tostring(as or"")
+if g==""then
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Please enter a key.",
@@ -2411,30 +2422,30 @@ Icon="triangle-alert",
 return
 end
 
-local f=al.validate(d)
-if f.success then
-ap:Close()()
+local h=an.validate(g)
+if h.success then
+ar:Close()()
 task.spawn(function()
-while al.isConnected()do
+while an.isConnected()do
 task.wait(5)
 end
 end)
 task.wait(0.4)
-ai(true)
+ai(true,h)
 else
-al.clearSavedKey()
+an.clearSavedKey()
 ag.PandaUI:Notify{
 Title="Key System Error",
-Content=f.error or"Invalid key",
+Content=h.error or"Invalid key",
 Icon="triangle-alert",
 }
 end
-end,"Primary",aA)
+end,"Primary",b)
 
-d.AnchorPoint=Vector2.new(1,0.5)
-d.Position=UDim2.new(1,0,0.5,0)
+g.AnchorPoint=Vector2.new(1,0.5)
+g.Position=UDim2.new(1,0,0.5,0)
 
-ap:Open()
+ar:Open()
 end
 
 return aa end function a.o():typeof(__modImpl())local aa=a.cache.o if not aa then aa={c=__modImpl()}a.cache.o=aa end return aa.c end end do local function __modImpl()
@@ -11716,10 +11727,14 @@ local aA=gethwid or function()
 return ah.LocalPlayer.UserId
 end
 local aB=aA()
+if aw.Keyless or(aw.KeySystem and aw.KeySystem.Keyless)then
+aa.AuthResult={success=true,isPremium=true,keyless=true}
+end
 if aw.KeySystem then
 ay=false
-an.new(aw,aB,function(b)
+an.new(aw,aB,function(b,d)
 ay=b
+aa.AuthResult=d
 end)
 repeat
 task.wait()
