@@ -10,7 +10,7 @@
 <img src="docs/PandaUI – Themes.png" alt="PandaUI Banner">
 
 > [!WARNING]
-> This PandaUI was not inspired by, and the name has nothing to do with UI Frameworks
+> This is Wind UI but a bit worser.
 
 > [!WARNING]
 > PandaUI is currently in Beta.
