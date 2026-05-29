@@ -120,6 +120,9 @@ function KeySystem.new(Config, Filename, func)
 	end
 
 	local serviceId = Config.KeySystem.ServiceId or "your-service-id"
+	if serviceId == "your-service-id" or serviceId == "your-service-id-here" or serviceId == "" then
+		warn("[PandaUI] WARNING: You are running the key system with a placeholder ServiceID. Please configure it with your actual ServiceID from the PandaAuth dashboard.")
+	end
 	local options = {
 		serviceId = serviceId,
 		kickOnDetect = Config.KeySystem.KickOnDetect or false,

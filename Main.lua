@@ -2236,6 +2236,9 @@ ak=ap
 end
 
 local al=ag.KeySystem.ServiceId or"your-service-id"
+if al=="your-service-id"or al=="your-service-id-here"or al==""then
+warn"[PandaUI] WARNING: You are running the key system with a placeholder ServiceID. Please configure it with your actual ServiceID from the PandaAuth dashboard."
+end
 local am={
 serviceId=al,
 kickOnDetect=ag.KeySystem.KickOnDetect or false,
