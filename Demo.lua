@@ -1,4 +1,4 @@
-local PandaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/watereater5558-bytecode/PandaUI/main/Main.lua"))()
+local PandaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/watereater5558-bytecode/PandaUI/main/Main.lua?t=" .. os.time()))()
 
 local Window = PandaUI:CreateWindow({
 	Title = "PandaUI Full Demo",
@@ -26,22 +26,22 @@ PandaUI:Notify({
 	Icon = "shield-check"
 })
 
-local Tab1 = Window:AddTab({ Title = "Dashboard", Icon = "home" })
-local Section1 = Tab1:AddSection({ Title = "Authentication Information" })
+local Tab1 = Window:Tab({ Title = "Dashboard", Icon = "home" })
+local Section1 = Tab1:Section({ Title = "Authentication Information" })
 
-Section1:AddLabel({
+Section1:Paragraph({
 	Title = "License Tier: " .. userTier,
-	Type = "Info"
+	Desc = "Your current authentication status."
 })
 
 if auth and auth.isPremium then
-	Section1:AddLabel({
-		Title = "Thanks for supporting us with premium!",
-		Type = "Success"
+	Section1:Paragraph({
+		Title = "Premium Active",
+		Desc = "Thanks for supporting us with premium!"
 	})
 end
 
-Section1:AddButton({
+Section1:Button({
 	Title = "Reset Saved License Key",
 	Callback = function()
 		PandaUI:ClearSavedKey()
@@ -54,11 +54,12 @@ Section1:AddButton({
 	end
 })
 
-local Tab2 = Window:AddTab({ Title = "UI Elements", Icon = "layout" })
-local Section2 = Tab2:AddSection({ Title = "Basic Elements" })
+local Tab2 = Window:Tab({ Title = "UI Elements", Icon = "layout" })
+local Section2 = Tab2:Section({ Title = "Basic Elements" })
 
-local button = Section2:AddButton({
+local button = Section2:Button({
 	Title = "Click Me",
+	Tooltip = "This displays a popup notification when clicked.",
 	Callback = function()
 		PandaUI:Notify({
 			Title = "Button Clicked",
@@ -68,10 +69,10 @@ local button = Section2:AddButton({
 		})
 	end
 })
-button:AddTooltip("This displays a popup notification when clicked.")
 
-Section2:AddCheckbox({
+Section2:Toggle({
 	Title = "Auto Loot",
+	Type = "Checkbox",
 	Default = false,
 	Callback = function(val)
 		PandaUI:Notify({
@@ -82,7 +83,7 @@ Section2:AddCheckbox({
 	end
 })
 
-Section2:AddToggle({
+Section2:Toggle({
 	Title = "Kill Aura",
 	Default = false,
 	Callback = function(val)
@@ -94,10 +95,10 @@ Section2:AddToggle({
 	end
 })
 
-Section2:AddDropdown({
+Section2:Dropdown({
 	Title = "Choose Teleport Location",
 	Multi = false,
-	Options = { "Spawn", "Lobby", "Arena", "Shop" },
+	Values = { "Spawn", "Lobby", "Arena", "Shop" },
 	Default = "Spawn",
 	Callback = function(selected)
 		PandaUI:Notify({
@@ -108,7 +109,7 @@ Section2:AddDropdown({
 	end
 })
 
-Section2:AddInput({
+Section2:Input({
 	Title = "WalkSpeed Multiplier",
 	Placeholder = "Enter speed (e.g. 50)",
 	Callback = function(text)
@@ -120,29 +121,29 @@ Section2:AddInput({
 	end
 })
 
-Section2:AddCode({
+Section2:Code({
 	Content = "local plr = game.Players.LocalPlayer\nprint(plr.Name)",
 	ReadOnly = true
 })
 
-local Tab3 = Window:AddTab({ Title = "Themes & Dialogs", Icon = "palette" })
-local Section3 = Tab3:AddSection({ Title = "Aesthetic Styles" })
+local Tab3 = Window:Tab({ Title = "Themes & Dialogs", Icon = "palette" })
+local Section3 = Tab3:Section({ Title = "Aesthetic Styles" })
 
-Section3:AddButton({
+Section3:Button({
 	Title = "Set Theme: Sky",
 	Callback = function()
 		PandaUI:SetTheme("Sky")
 	end
 })
 
-Section3:AddButton({
+Section3:Button({
 	Title = "Set Theme: Dracula",
 	Callback = function()
 		PandaUI:SetTheme("Dracula")
 	end
 })
 
-Section3:AddButton({
+Section3:Button({
 	Title = "Trigger Confirmation Dialog",
 	Callback = function()
 		PandaUI:Popup({

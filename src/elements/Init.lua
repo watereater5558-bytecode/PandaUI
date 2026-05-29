@@ -18,6 +18,7 @@ return {
 		HStack = require("./HStack"),
 		VStack = require("./VStack"),
 		Viewport = require("./Viewport"),
+		Video = require("./Video"),
 	},
 	Load = function(tbl, Container, Elements, Window, PandaUI, OnElementCreateFunction, ElementsModule, UIScale, Tab)
 		for name, module in next, Elements do

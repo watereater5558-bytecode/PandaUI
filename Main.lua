@@ -2377,11 +2377,23 @@ FillDirection="Horizontal",
 }),
 })
 
-local aB
-if ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Image then
+local aB=ac("Frame",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+},{
+ac("UIListLayout",{
+Padding=UDim.new(0,9),
+FillDirection="Vertical",
+}),
+aA,
+})
+
 local b
+if ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Image then
+local d
 if ag.KeySystem.Thumbnail.Title then
-b=ac("TextLabel",{
+d=ac("TextLabel",{
 Text=ag.KeySystem.Thumbnail.Title,
 ThemeTag={
 TextColor3="Text",
@@ -2394,7 +2406,7 @@ AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 })
 end
-aB=ac("ImageLabel",{
+b=ac("ImageLabel",{
 Image=ag.KeySystem.Thumbnail.Image,
 BackgroundTransparency=1,
 Size=UDim2.new(0,ar,1,-12),
@@ -2402,7 +2414,7 @@ Position=UDim2.new(0,6,0,6),
 Parent=ap.UIElements.Main,
 ScaleType="Crop",
 },{
-b,
+d,
 ac("UICorner",{
 CornerRadius=UDim.new(0,20),
 }),
@@ -2410,8 +2422,8 @@ CornerRadius=UDim.new(0,20),
 end
 
 ac("Frame",{
-Size=UDim2.new(1,aB and-ar or 0,1,0),
-Position=UDim2.new(0,aB and ar or 0,0,0),
+Size=UDim2.new(1,b and-ar or 0,1,0),
+Position=UDim2.new(0,b and ar or 0,0,0),
 BackgroundTransparency=1,
 Parent=ap.UIElements.Main,
 },{
@@ -2426,7 +2438,7 @@ FillDirection="Vertical",
 ax,
 az,
 ay,
-aA,
+aB,
 ac("UIPadding",{
 PaddingTop=UDim.new(0,16),
 PaddingLeft=UDim.new(0,16),
@@ -2436,27 +2448,27 @@ PaddingBottom=UDim.new(0,16),
 }),
 })
 
-local b=ae("Exit","log-out",function()
+local d=ae("Exit","log-out",function()
 ap:Close()()
 end,"Tertiary",aA.Frame)
 
-if aB then
-b.Parent=aB
-b.Size=UDim2.new(0,0,0,42)
-b.Position=UDim2.new(0,10,1,-10)
-b.AnchorPoint=Vector2.new(0,1)
+if b then
+d.Parent=b
+d.Size=UDim2.new(0,0,0,42)
+d.Position=UDim2.new(0,10,1,-10)
+d.AnchorPoint=Vector2.new(0,1)
 end
 
 ae("Get key","key",function()
-local d=ak.copyGetKeyUrl()
-if d.success then
+local f=ak.copyGetKeyUrl()
+if f.success then
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Key URL copied to clipboard.",
 Icon="key",
 }
 else
-setclipboard(d.url or ak.getKeyUrl()or"")
+setclipboard(f.url or ak.getKeyUrl()or"")
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Key URL copied via fallback.",
@@ -2465,7 +2477,7 @@ Icon="key",
 end
 end,"Secondary",aA.Frame)
 
-ae("Clear Key","trash",function()
+ae("Clear","trash",function()
 ak.clearSavedKey()
 ag.PandaUI:Notify{
 Title="Key System",
@@ -2474,9 +2486,9 @@ Icon="trash",
 }
 end,"Secondary",aA.Frame)
 
-local d=ae("Submit","arrow-right",function()
-local d=tostring(aq or"")
-if d==""then
+local f=ae("Submit","arrow-right",function()
+local f=tostring(aq or"")
+if f==""then
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Please enter a key.",
@@ -2485,29 +2497,31 @@ Icon="triangle-alert",
 return
 end
 
-local f=ak.validate(d)
-if f.success then
+local g=ak.validate(f)
+if g.success then
 ap:Close()()
 task.spawn(function()
-local g=aj and ak.isAuthenticated or ak.isConnected
-while g()do
+local h=aj and ak.isAuthenticated or ak.isConnected
+while h()do
 task.wait(5)
 end
 end)
 task.wait(0.4)
-ai(true,f)
+ai(true,g)
 else
 ak.clearSavedKey()
 ag.PandaUI:Notify{
 Title="Key System Error",
-Content=f.error or"Invalid key",
+Content=g.error or"Invalid key",
 Icon="triangle-alert",
 }
 end
-end,"Primary",aA)
+end,"Primary",aB)
 
-d.AnchorPoint=Vector2.new(1,0.5)
-d.Position=UDim2.new(1,0,0.5,0)
+f.Size=UDim2.new(1,0,0,42)
+
+
+ab.Drag(ap.UIElements.MainContainer,{ax})
 
 ap:Open()
 end
@@ -8515,6 +8529,82 @@ am.Main=ar
 return am.__type,am
 end
 return aj end function a.Y():typeof(__modImpl())local aa=a.cache.Y if not aa then aa={c=__modImpl()}a.cache.Y=aa end return aa.c end end do local function __modImpl()
+local aa=a.c()
+local ae=aa.New
+local af={}
+local function ParseAspectRatio(ah)
+if type(ah)=="string"then
+local aj,ak=ah:match"(%d+):(%d+)"
+if aj and ak then
+return tonumber(aj)/tonumber(ak)
+end
+elseif type(ah)=="number"then
+return ah
+end
+return nil
+end
+function af.New(ah,aj)
+local ak={
+__type="Video",
+Video=aj.Video or"",
+AspectRatio=aj.AspectRatio or"16:9",
+Radius=aj.Radius or aj.Window.ElementConfig.UICorner,
+}
+local al
+if ak.Video then
+local am
+if string.find(ak.Video,"http")then
+local an=aj.Window.Folder.."/assets/."..aa.SanitizeFilename(ak.Video)..".webm"
+if not isfile(an)then
+local ao,ap=pcall(function()
+local ao=aa.Request{Url=ak.Video,Method="GET",Headers={["User-Agent"]="Roblox/Exploit"}}
+writefile(an,ao.Body)
+end)
+if not ao then
+warn("[ Window.Background ] Failed to download video: "..tostring(ap))
+return
+end
+end
+local ao,ap=pcall(function()
+return getcustomasset(an)
+end)
+if not ao then
+warn("[ Window.Background ] Failed to load custom asset: "..tostring(ap))
+end
+am=ap
+else
+am=ak.Video
+end
+al=ae("VideoFrame",{
+BackgroundTransparency=1,
+Size=UDim2.new(1,0,1,0),
+Video=am,
+Looped=false,
+Volume=0,
+Parent=aj.Parent
+},{
+ae("UICorner",{
+CornerRadius=UDim.new(0,ak.Radius)
+}),
+})
+al:Play()
+local an=ParseAspectRatio(ak.AspectRatio)
+local ao
+if an then
+ao=ae("UIAspectRatioConstraint",{
+Parent=al,
+AspectRatio=an,
+AspectType="ScaleWithParentSize",
+DominantAxis="Width"
+})
+end
+end
+function ak.Destroy(am)
+if al then al:Destroy()end
+end
+return ak.__type,ak
+end
+return af end function a.Z():typeof(__modImpl())local aa=a.cache.Z if not aa then aa={c=__modImpl()}a.cache.Z=aa end return aa.c end end do local function __modImpl()
 return{
 Elements={
 Paragraph=a.C(),
@@ -8535,6 +8625,7 @@ Group=a.V(),
 HStack=a.W(),
 VStack=a.X(),
 Viewport=a.Y(),
+Video=a.Z(),
 },
 Load=function(aa,ae,af,ah,aj,ak,al,am,an)
 for ao,ap in next,af do
@@ -8644,7 +8735,7 @@ end
 end
 end
 end,
-}end function a.Z():typeof(__modImpl())local aa=a.cache.Z if not aa then aa={c=__modImpl()}a.cache.Z=aa end return aa.c end end do local function __modImpl()
+}end function a._():typeof(__modImpl())local aa=a.cache._ if not aa then aa={c=__modImpl()}a.cache._=aa end return aa.c end end do local function __modImpl()
 local aa=(cloneref or clonereference or function(aa)
 return aa
 end)
@@ -8995,7 +9086,7 @@ ap.UIElements.ContainerFrame.ScrollingEnabled=true
 end)
 return ap
 end
-local ay=a.Z()
+local ay=a._()
 ay.Load(
 ap,
 ap.UIElements.ContainerFrame,
@@ -9158,12 +9249,12 @@ end)
 am.OnChangeFunc(ao)
 end
 end
-return am end function a._():typeof(__modImpl())local aa=a.cache._ if not aa then aa={c=__modImpl()}a.cache._=aa end return aa.c end end do local function __modImpl()
+return am end function a.aa():typeof(__modImpl())local aa=a.cache.aa if not aa then aa={c=__modImpl()}a.cache.aa=aa end return aa.c end end do local function __modImpl()
 local aa={}
 local ae=a.c()
 local af=ae.New
 local ah=ae.Tween
-local aj=a._()
+local aj=a.aa()
 function aa.New(ak,al,am,an,ao)
 local ap={
 Title=ak.Title or"Section",
@@ -9311,7 +9402,7 @@ end)
 end
 return ap
 end
-return aa end function a.aa():typeof(__modImpl())local aa=a.cache.aa if not aa then aa={c=__modImpl()}a.cache.aa=aa end return aa.c end end do local function __modImpl()
+return aa end function a.ab():typeof(__modImpl())local aa=a.cache.ab if not aa then aa={c=__modImpl()}a.cache.ab=aa end return aa.c end end do local function __modImpl()
 return{
 Tab="table-of-contents",
 Paragraph="type",
@@ -9323,7 +9414,7 @@ Input="text-cursor-input",
 Dropdown="chevrons-up-down",
 Code="terminal",
 Colorpicker="palette",
-}end function a.ab():typeof(__modImpl())local aa=a.cache.ab if not aa then aa={c=__modImpl()}a.cache.ab=aa end return aa.c end end do local function __modImpl()
+}end function a.ac():typeof(__modImpl())local aa=a.cache.ac if not aa then aa={c=__modImpl()}a.cache.ac=aa end return aa.c end end do local function __modImpl()
 local aa=(cloneref or clonereference or function(aa)
 return aa
 end)
@@ -9342,7 +9433,7 @@ Padding=14,
 Radius=22,
 Width=400,
 MaxHeight=380,
-Icons=a.ab(),
+Icons=a.ac(),
 }
 local ao=ah("TextBox",{
 Text="",
@@ -9788,7 +9879,7 @@ an:Search(ao.Text)
 end)
 return an
 end
-return ae end function a.ac():typeof(__modImpl())local aa=a.cache.ac if not aa then aa={c=__modImpl()}a.cache.ac=aa end return aa.c end end do local function __modImpl()
+return ae end function a.ad():typeof(__modImpl())local aa=a.cache.ad if not aa then aa={c=__modImpl()}a.cache.ad=aa end return aa.c end end do local function __modImpl()
 local aa=(cloneref or clonereference or function(aa)
 return aa
 end)
@@ -11118,8 +11209,8 @@ end
 if au.OpenButton and typeof(au.OpenButton)=="table"then
 au:EditOpenButton(au.OpenButton)
 end
-local z=a._()
-local A=a.aa()
+local z=a.aa()
+local A=a.ab()
 local B=z.Init(au,at.PandaUI,at.PandaUI.TooltipGui)
 B:OnChange(function(C)
 au.CurrentTab=C
@@ -11481,7 +11572,7 @@ J=N
 end
 end)
 if not au.HideSearchBar then
-local M=a.ac()
+local M=a.ad()
 local N=false
 
 local O=ao("Search","search",au.UIElements.SideBarContainer,true)
@@ -11515,7 +11606,7 @@ end
 end
 end
 return au
-end end function a.ad():typeof(__modImpl())local aa=a.cache.ad if not aa then aa={c=__modImpl()}a.cache.ad=aa end return aa.c end end end
+end end function a.ae():typeof(__modImpl())local aa=a.cache.ae if not aa then aa={c=__modImpl()}a.cache.ae=aa end return aa.c end end end
 local aa={
 Window=nil,
 Theme=nil,
@@ -11824,7 +11915,7 @@ end
 end
 end
 function aa.CreateWindow(av,aw)
-local ax=a.ad()
+local ax=a.ae()
 if not ak:IsStudio()and writefile then
 if not isfolder"PandaUI"then
 makefolder"PandaUI"

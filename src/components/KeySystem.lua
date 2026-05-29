@@ -245,7 +245,7 @@ function KeySystem.new(Config, Filename, func)
 		})
 	end
 
-	local ButtonsContainer = New("Frame", {
+	local ButtonsRow = New("Frame", {
 		Size = UDim2.new(1, 0, 0, 42),
 		BackgroundTransparency = 1,
 	}, {
@@ -259,6 +259,18 @@ function KeySystem.new(Config, Filename, func)
 				FillDirection = "Horizontal",
 			}),
 		}),
+	})
+
+	local ButtonsContainer = New("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = "Y",
+		BackgroundTransparency = 1,
+	}, {
+		New("UIListLayout", {
+			Padding = UDim.new(0, 9),
+			FillDirection = "Vertical",
+		}),
+		ButtonsRow,
 	})
 
 	local ThumbnailFrame
@@ -322,7 +334,7 @@ function KeySystem.new(Config, Filename, func)
 
 	local ExitButton = CreateButton("Exit", "log-out", function()
 		KeyDialog:Close()()
-	end, "Tertiary", ButtonsContainer.Frame)
+	end, "Tertiary", ButtonsRow.Frame)
 
 	if ThumbnailFrame then
 		ExitButton.Parent = ThumbnailFrame
@@ -347,16 +359,16 @@ function KeySystem.new(Config, Filename, func)
 				Icon = "key",
 			})
 		end
-	end, "Secondary", ButtonsContainer.Frame)
+	end, "Secondary", ButtonsRow.Frame)
 
-	CreateButton("Clear Key", "trash", function()
+	CreateButton("Clear", "trash", function()
 		Lib.clearSavedKey()
 		Config.PandaUI:Notify({
 			Title = "Key System",
 			Content = "Saved key cleared.",
 			Icon = "trash",
 		})
-	end, "Secondary", ButtonsContainer.Frame)
+	end, "Secondary", ButtonsRow.Frame)
 
 	local SubmitButton = CreateButton("Submit", "arrow-right", function()
 		local key = tostring(EnteredKey or "")
@@ -390,8 +402,10 @@ function KeySystem.new(Config, Filename, func)
 		end
 	end, "Primary", ButtonsContainer)
 
-	SubmitButton.AnchorPoint = Vector2.new(1, 0.5)
-	SubmitButton.Position = UDim2.new(1, 0, 0.5, 0)
+	SubmitButton.Size = UDim2.new(1, 0, 0, 42)
+
+	-- Make the key system dialog draggable by the title area
+	Creator.Drag(KeyDialog.UIElements.MainContainer, { TitleContainer })
 
 	KeyDialog:Open()
 end
