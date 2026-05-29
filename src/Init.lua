@@ -225,6 +225,8 @@ PandaUI:SetLanguage(Creator.Language)
 function PandaUI:ClearSavedKey()
 	if PandaUI.WilkinsInstance then
 		PandaUI.WilkinsInstance.clearSavedKey()
+	elseif PandaUI.CookiesInstance then
+		PandaUI.CookiesInstance.clearSavedKey()
 	else
 		local wsCtor
 		local ws
@@ -263,6 +265,41 @@ function PandaUI:ClearSavedKey()
 					if Wilkins and type(Wilkins.clearSavedKey) == "function" then
 						Wilkins.clearSavedKey()
 					end
+				end
+			end)
+		end
+
+		local httpReq = request
+			or http_request
+			or httprequest
+			or (syn and syn.request)
+			or (http and http.request)
+			or (fluxus and fluxus.request)
+		local body
+		if httpReq then
+			local success, resp = pcall(httpReq, {
+				Url = "https://secure.pandauth.com/cv4/lib",
+				Method = "GET"
+			})
+			if success and resp then
+				local respBody = resp.Body or resp.body or ""
+				local statusCode = resp.StatusCode or resp.statusCode or 0
+				if statusCode >= 200 and statusCode < 300 and #respBody >= 100 then
+					body = respBody
+				end
+			end
+		end
+		if not body then
+			local success, respBody = pcall(game.HttpGet, game, "https://secure.pandauth.com/cv4/lib")
+			if success and typeof(respBody) == "string" and #respBody >= 100 then
+				body = respBody
+			end
+		end
+		if body then
+			pcall(function()
+				local Cookies = loadstring(body)()
+				if Cookies and type(Cookies.clearSavedKey) == "function" then
+					Cookies.clearSavedKey()
 				end
 			end)
 		end

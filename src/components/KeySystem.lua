@@ -11,91 +11,145 @@ function KeySystem.new(Config, Filename, func)
 		return
 	end
 
-	local wsCtor
-	local ws
-	local ctors = {
-		WebSocket and WebSocket.connect,
-		syn and syn.websocket and syn.websocket.connect,
-		websocket and websocket.connect
-	}
-	for _, ctor in ipairs(ctors) do
-		if typeof(ctor) == "function" then
-			local success, res = pcall(ctor, "wss://secure.pandauth.com/ws?type=wilkins-lib")
-			if success and (typeof(res) == "table" or typeof(res) == "userdata") then
-				local hasOnMessage = false
-				pcall(function()
-					hasOnMessage = (res.OnMessage ~= nil)
-				end)
-				if hasOnMessage then
-					wsCtor = ctor
-					ws = res
-					break
+	local isV43 = Config.KeySystem and (Config.KeySystem.Version == "V4.3" or Config.KeySystem.Version == "Cookies")
+	local Lib
+
+	if isV43 then
+		local httpReq = request
+			or http_request
+			or httprequest
+			or (syn and syn.request)
+			or (http and http.request)
+			or (fluxus and fluxus.request)
+
+		local body
+		if httpReq then
+			local success, resp = pcall(httpReq, {
+				Url = "https://secure.pandauth.com/cv4/lib",
+				Method = "GET"
+			})
+			if success and resp then
+				local respBody = resp.Body or resp.body or ""
+				local statusCode = resp.StatusCode or resp.statusCode or 0
+				if statusCode >= 200 and statusCode < 300 and #respBody >= 100 then
+					body = respBody
 				end
 			end
 		end
-	end
 
-	if not wsCtor or not ws then
-		warn("[PandaUI] Your executor does not support WebSocket or connection failed.")
-		func(false)
-		return
-	end
-
-	local libCode
-	do
-		ws.OnMessage:Connect(function(msg)
-			if msg and #msg > 0 and not libCode then
-				libCode = msg
+		if not body then
+			local success, respBody = pcall(game.HttpGet, game, "https://secure.pandauth.com/cv4/lib")
+			if success and typeof(respBody) == "string" and #respBody >= 100 then
+				body = respBody
 			end
-		end)
-		local deadline = tick() + 15
-		repeat task.wait(0.05) until libCode or tick() > deadline
-		pcall(function() ws:Close() end)
-	end
+		end
 
-	if not libCode then
-		warn("[PandaUI] Failed to fetch Wilkins library (timeout).")
-		func(false)
-		return
-	end
+		if not body then
+			warn("[PandaUI] Bad lib response or HTTP requests are not supported.")
+			func(false)
+			return
+		end
 
-	local Wilkins = loadstring(libCode)()
-	if not Wilkins or type(Wilkins.configure) ~= "function" then
-		warn("[PandaUI] Wilkins library failed to initialize.")
-		func(false)
-		return
-	end
+		local Cookies = loadstring(body)()
+		if not Cookies or type(Cookies.configure) ~= "function" then
+			warn("[PandaUI] Cookies library failed to initialize.")
+			func(false)
+			return
+		end
 
-	Config.PandaUI.WilkinsInstance = Wilkins
+		Config.PandaUI.CookiesInstance = Cookies
+		Lib = Cookies
+	else
+		local wsCtor
+		local ws
+		local ctors = {
+			WebSocket and WebSocket.connect,
+			syn and syn.websocket and syn.websocket.connect,
+			websocket and websocket.connect
+		}
+		for _, ctor in ipairs(ctors) do
+			if typeof(ctor) == "function" then
+				local success, res = pcall(ctor, "wss://secure.pandauth.com/ws?type=wilkins-lib")
+				if success and (typeof(res) == "table" or typeof(res) == "userdata") then
+					local hasOnMessage = false
+					pcall(function()
+						hasOnMessage = (res.OnMessage ~= nil)
+					end)
+					if hasOnMessage then
+						wsCtor = ctor
+						ws = res
+						break
+					end
+				end
+			end
+		end
+
+		if not wsCtor or not ws then
+			warn("[PandaUI] Your executor does not support WebSocket or connection failed.")
+			func(false)
+			return
+		end
+
+		local libCode
+		do
+			ws.OnMessage:Connect(function(msg)
+				if msg and #msg > 0 and not libCode then
+					libCode = msg
+				end
+			end)
+			local deadline = tick() + 15
+			repeat task.wait(0.05) until libCode or tick() > deadline
+			pcall(function() ws:Close() end)
+		end
+
+		if not libCode then
+			warn("[PandaUI] Failed to fetch Wilkins library (timeout).")
+			func(false)
+			return
+		end
+
+		local Wilkins = loadstring(libCode)()
+		if not Wilkins or type(Wilkins.configure) ~= "function" then
+			warn("[PandaUI] Wilkins library failed to initialize.")
+			func(false)
+			return
+		end
+
+		Config.PandaUI.WilkinsInstance = Wilkins
+		Lib = Wilkins
+	end
 
 	local serviceId = Config.KeySystem.ServiceId or "your-service-id"
-	Wilkins.configure({
+	local options = {
 		serviceId = serviceId,
-		debug = Config.KeySystem.Debug or false,
 		kickOnDetect = Config.KeySystem.KickOnDetect or false,
 		openDashboard = Config.KeySystem.OpenDashboard or false,
 		validationTimeout = Config.KeySystem.ValidationTimeout or 600,
-		onTamper = function(flags)
+	}
+	if not isV43 then
+		options.onTamper = function(flags)
 			warn("[PandaUI] Tamper flagged:", table.concat(flags or {}, ","))
-		end,
-		onSessionEnd = function(reason, msg)
+		end
+		options.onSessionEnd = function(reason, msg)
 			warn("[PandaUI] Session ended:", reason, msg or "")
-		end,
-	})
+		end
+	end
+	Lib.configure(options)
 
-	local savedKey = Wilkins.loadSavedKey()
+	local savedKey = Lib.loadSavedKey()
 	if savedKey and savedKey ~= "" then
-		local result = Wilkins.validate(savedKey)
+		local result = Lib.validate(savedKey)
 		if result.success then
 			task.spawn(function()
-				while Wilkins.isConnected() do
+				local checkFunc = isV43 and Lib.isAuthenticated or Lib.isConnected
+				while checkFunc() do
 					task.wait(5)
 				end
 			end)
 			func(true, result)
 			return
 		else
-			Wilkins.clearSavedKey()
+			Lib.clearSavedKey()
 		end
 	end
 
@@ -275,7 +329,7 @@ function KeySystem.new(Config, Filename, func)
 	end
 
 	CreateButton("Get key", "key", function()
-		local info = Wilkins.copyGetKeyUrl()
+		local info = Lib.copyGetKeyUrl()
 		if info.success then
 			Config.PandaUI:Notify({
 				Title = "Key System",
@@ -283,7 +337,7 @@ function KeySystem.new(Config, Filename, func)
 				Icon = "key",
 			})
 		else
-			setclipboard(info.url or Wilkins.getKeyUrl() or "")
+			setclipboard(info.url or Lib.getKeyUrl() or "")
 			Config.PandaUI:Notify({
 				Title = "Key System",
 				Content = "Key URL copied via fallback.",
@@ -293,7 +347,7 @@ function KeySystem.new(Config, Filename, func)
 	end, "Secondary", ButtonsContainer.Frame)
 
 	CreateButton("Clear Key", "trash", function()
-		Wilkins.clearSavedKey()
+		Lib.clearSavedKey()
 		Config.PandaUI:Notify({
 			Title = "Key System",
 			Content = "Saved key cleared.",
@@ -312,18 +366,19 @@ function KeySystem.new(Config, Filename, func)
 			return
 		end
 
-		local result = Wilkins.validate(key)
+		local result = Lib.validate(key)
 		if result.success then
 			KeyDialog:Close()()
 			task.spawn(function()
-				while Wilkins.isConnected() do
+				local checkFunc = isV43 and Lib.isAuthenticated or Lib.isConnected
+				while checkFunc() do
 					task.wait(5)
 				end
 			end)
 			task.wait(0.4)
 			func(true, result)
 		else
-			Wilkins.clearSavedKey()
+			Lib.clearSavedKey()
 			Config.PandaUI:Notify({
 				Title = "Key System Error",
 				Content = result.error or "Invalid key",

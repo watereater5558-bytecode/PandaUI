@@ -2127,114 +2127,168 @@ ai(true)
 return
 end
 
-local aj
+local aj=ag.KeySystem and(ag.KeySystem.Version=="V4.3"or ag.KeySystem.Version=="Cookies")
 local ak
-local al={
-WebSocket and WebSocket.connect,
-syn and syn.websocket and syn.websocket.connect,
-websocket and websocket.connect
-}
-for am,an in ipairs(al)do
-if typeof(an)=="function"then
-local ao,ap=pcall(an,"wss://secure.pandauth.com/ws?type=wilkins-lib")
-if ao and(typeof(ap)=="table"or typeof(ap)=="userdata")then
-local aq=false
-pcall(function()
-aq=(ap.OnMessage~=nil)
-end)
-if aq then
-aj=an
-ak=ap
-break
-end
-end
-end
-end
 
-if not aj or not ak then
-warn"[PandaUI] Your executor does not support WebSocket or connection failed."
-ai(false)
-return
-end
+if aj then
+local al=request
+or http_request
+or httprequest
+or(syn and syn.request)
+or(http and http.request)
+or(fluxus and fluxus.request)
 
 local am
-do
-ak.OnMessage:Connect(function(an)
-if an and#an>0 and not am then
-am=an
+if al then
+local an,ao=pcall(al,{
+Url="https://secure.pandauth.com/cv4/lib",
+Method="GET"
+})
+if an and ao then
+local ap=ao.Body or ao.body or""
+local aq=ao.StatusCode or ao.statusCode or 0
+if aq>=200 and aq<300 and#ap>=100 then
+am=ap
 end
-end)
-local an=tick()+15
-repeat task.wait(0.05)until am or tick()>an
-pcall(function()ak:Close()end)
+end
 end
 
 if not am then
-warn"[PandaUI] Failed to fetch Wilkins library (timeout)."
+local an,ao=pcall(game.HttpGet,game,"https://secure.pandauth.com/cv4/lib")
+if an and typeof(ao)=="string"and#ao>=100 then
+am=ao
+end
+end
+
+if not am then
+warn"[PandaUI] Bad lib response or HTTP requests are not supported."
 ai(false)
 return
 end
 
 local an=loadstring(am)()
 if not an or type(an.configure)~="function"then
+warn"[PandaUI] Cookies library failed to initialize."
+ai(false)
+return
+end
+
+ag.PandaUI.CookiesInstance=an
+ak=an
+else
+local al
+local am
+local an={
+WebSocket and WebSocket.connect,
+syn and syn.websocket and syn.websocket.connect,
+websocket and websocket.connect
+}
+for ao,ap in ipairs(an)do
+if typeof(ap)=="function"then
+local aq,ar=pcall(ap,"wss://secure.pandauth.com/ws?type=wilkins-lib")
+if aq and(typeof(ar)=="table"or typeof(ar)=="userdata")then
+local as=false
+pcall(function()
+as=(ar.OnMessage~=nil)
+end)
+if as then
+al=ap
+am=ar
+break
+end
+end
+end
+end
+
+if not al or not am then
+warn"[PandaUI] Your executor does not support WebSocket or connection failed."
+ai(false)
+return
+end
+
+local ao
+do
+am.OnMessage:Connect(function(ap)
+if ap and#ap>0 and not ao then
+ao=ap
+end
+end)
+local ap=tick()+15
+repeat task.wait(0.05)until ao or tick()>ap
+pcall(function()am:Close()end)
+end
+
+if not ao then
+warn"[PandaUI] Failed to fetch Wilkins library (timeout)."
+ai(false)
+return
+end
+
+local ap=loadstring(ao)()
+if not ap or type(ap.configure)~="function"then
 warn"[PandaUI] Wilkins library failed to initialize."
 ai(false)
 return
 end
 
-ag.PandaUI.WilkinsInstance=an
+ag.PandaUI.WilkinsInstance=ap
+ak=ap
+end
 
-local ao=ag.KeySystem.ServiceId or"your-service-id"
-an.configure{
-serviceId=ao,
-debug=ag.KeySystem.Debug or false,
+local al=ag.KeySystem.ServiceId or"your-service-id"
+local am={
+serviceId=al,
 kickOnDetect=ag.KeySystem.KickOnDetect or false,
 openDashboard=ag.KeySystem.OpenDashboard or false,
 validationTimeout=ag.KeySystem.ValidationTimeout or 600,
-onTamper=function(ap)
-warn("[PandaUI] Tamper flagged:",table.concat(ap or{},","))
-end,
-onSessionEnd=function(ap,aq)
-warn("[PandaUI] Session ended:",ap,aq or"")
-end,
 }
+if not aj then
+am.onTamper=function(an)
+warn("[PandaUI] Tamper flagged:",table.concat(an or{},","))
+end
+am.onSessionEnd=function(an,ao)
+warn("[PandaUI] Session ended:",an,ao or"")
+end
+end
+ak.configure(am)
 
-local ap=an.loadSavedKey()
-if ap and ap~=""then
-local aq=an.validate(ap)
-if aq.success then
+local an=ak.loadSavedKey()
+if an and an~=""then
+local ao=ak.validate(an)
+if ao.success then
 task.spawn(function()
-while an.isConnected()do
+local ap=aj and ak.isAuthenticated or ak.isConnected
+while ap()do
 task.wait(5)
 end
 end)
-ai(true,aq)
+ai(true,ao)
 return
 else
-an.clearSavedKey()
+ak.clearSavedKey()
 end
 end
 
-local aq=a.n()
-local ar=aq.Create(true,"Popup",ag.Window,ag.PandaUI,ag.PandaUI.ScreenGui.KeySystem)
-local as=""
-local at=(ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Width)or 200
-local au=430
+local ao=a.n()
+local ap=ao.Create(true,"Popup",ag.Window,ag.PandaUI,ag.PandaUI.ScreenGui.KeySystem)
+local aq=""
+local ar=(ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Width)or 200
+local as=430
 if ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Image then
-au=430+(at/2)
+as=430+(ar/2)
 end
 
-ar.UIElements.Main.AutomaticSize="Y"
-ar.UIElements.Main.Size=UDim2.new(0,au,0,0)
+ap.UIElements.Main.AutomaticSize="Y"
+ap.UIElements.Main.Size=UDim2.new(0,as,0,0)
 
-local av
+local at
 if ag.Icon then
-av=ab.Image(ag.Icon,ag.Title..":"..ag.Icon,0,"Temp","KeySystem",ag.IconThemed)
-av.Size=UDim2.new(0,24,0,24)
-av.LayoutOrder=-1
+at=ab.Image(ag.Icon,ag.Title..":"..ag.Icon,0,"Temp","KeySystem",ag.IconThemed)
+at.Size=UDim2.new(0,24,0,24)
+at.LayoutOrder=-1
 end
 
-local aw=ac("TextLabel",{
+local au=ac("TextLabel",{
 AutomaticSize="XY",
 BackgroundTransparency=1,
 Text=ag.KeySystem.Title or ag.Title,
@@ -2245,7 +2299,7 @@ TextColor3="Text",
 TextSize=20,
 })
 
-local ax=ac("TextLabel",{
+local av=ac("TextLabel",{
 AutomaticSize="XY",
 BackgroundTransparency=1,
 Text="Key System",
@@ -2259,7 +2313,7 @@ TextColor3="Text",
 TextSize=16,
 })
 
-local ay=ac("Frame",{
+local aw=ac("Frame",{
 BackgroundTransparency=1,
 AutomaticSize="XY",
 },{
@@ -2268,26 +2322,26 @@ Padding=UDim.new(0,14),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
 }),
-av,
-aw,
+at,
+au,
 })
 
-local az=ac("Frame",{
+local ax=ac("Frame",{
 AutomaticSize="Y",
 Size=UDim2.new(1,0,0,0),
 BackgroundTransparency=1,
 },{
-ay,
-ax,
+aw,
+av,
 })
 
-local aA=af("Enter Key","key",nil,"Input",function(aA)
-as=aA
+local ay=af("Enter Key","key",nil,"Input",function(ay)
+aq=ay
 end)
 
-local aB
+local az
 if ag.KeySystem.Note and ag.KeySystem.Note~=""then
-aB=ac("TextLabel",{
+az=ac("TextLabel",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 FontFace=Font.new(ab.Font,Enum.FontWeight.Medium),
@@ -2304,7 +2358,7 @@ TextWrapped=true,
 })
 end
 
-local b=ac("Frame",{
+local aA=ac("Frame",{
 Size=UDim2.new(1,0,0,42),
 BackgroundTransparency=1,
 },{
@@ -2320,11 +2374,11 @@ FillDirection="Horizontal",
 }),
 })
 
-local d
+local aB
 if ag.KeySystem.Thumbnail and ag.KeySystem.Thumbnail.Image then
-local f
+local b
 if ag.KeySystem.Thumbnail.Title then
-f=ac("TextLabel",{
+b=ac("TextLabel",{
 Text=ag.KeySystem.Thumbnail.Title,
 ThemeTag={
 TextColor3="Text",
@@ -2337,15 +2391,15 @@ AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 })
 end
-d=ac("ImageLabel",{
+aB=ac("ImageLabel",{
 Image=ag.KeySystem.Thumbnail.Image,
 BackgroundTransparency=1,
-Size=UDim2.new(0,at,1,-12),
+Size=UDim2.new(0,ar,1,-12),
 Position=UDim2.new(0,6,0,6),
-Parent=ar.UIElements.Main,
+Parent=ap.UIElements.Main,
 ScaleType="Crop",
 },{
-f,
+b,
 ac("UICorner",{
 CornerRadius=UDim.new(0,20),
 }),
@@ -2353,10 +2407,10 @@ CornerRadius=UDim.new(0,20),
 end
 
 ac("Frame",{
-Size=UDim2.new(1,d and-at or 0,1,0),
-Position=UDim2.new(0,d and at or 0,0,0),
+Size=UDim2.new(1,aB and-ar or 0,1,0),
+Position=UDim2.new(0,aB and ar or 0,0,0),
 BackgroundTransparency=1,
-Parent=ar.UIElements.Main,
+Parent=ap.UIElements.Main,
 },{
 ac("Frame",{
 Size=UDim2.new(1,0,1,0),
@@ -2366,10 +2420,10 @@ ac("UIListLayout",{
 Padding=UDim.new(0,18),
 FillDirection="Vertical",
 }),
+ax,
 az,
-aB,
+ay,
 aA,
-b,
 ac("UIPadding",{
 PaddingTop=UDim.new(0,16),
 PaddingLeft=UDim.new(0,16),
@@ -2379,47 +2433,47 @@ PaddingBottom=UDim.new(0,16),
 }),
 })
 
-local f=ae("Exit","log-out",function()
-ar:Close()()
-end,"Tertiary",b.Frame)
+local b=ae("Exit","log-out",function()
+ap:Close()()
+end,"Tertiary",aA.Frame)
 
-if d then
-f.Parent=d
-f.Size=UDim2.new(0,0,0,42)
-f.Position=UDim2.new(0,10,1,-10)
-f.AnchorPoint=Vector2.new(0,1)
+if aB then
+b.Parent=aB
+b.Size=UDim2.new(0,0,0,42)
+b.Position=UDim2.new(0,10,1,-10)
+b.AnchorPoint=Vector2.new(0,1)
 end
 
 ae("Get key","key",function()
-local g=an.copyGetKeyUrl()
-if g.success then
+local d=ak.copyGetKeyUrl()
+if d.success then
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Key URL copied to clipboard.",
 Icon="key",
 }
 else
-setclipboard(g.url or an.getKeyUrl()or"")
+setclipboard(d.url or ak.getKeyUrl()or"")
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Key URL copied via fallback.",
 Icon="key",
 }
 end
-end,"Secondary",b.Frame)
+end,"Secondary",aA.Frame)
 
 ae("Clear Key","trash",function()
-an.clearSavedKey()
+ak.clearSavedKey()
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Saved key cleared.",
 Icon="trash",
 }
-end,"Secondary",b.Frame)
+end,"Secondary",aA.Frame)
 
-local g=ae("Submit","arrow-right",function()
-local g=tostring(as or"")
-if g==""then
+local d=ae("Submit","arrow-right",function()
+local d=tostring(aq or"")
+if d==""then
 ag.PandaUI:Notify{
 Title="Key System",
 Content="Please enter a key.",
@@ -2428,30 +2482,31 @@ Icon="triangle-alert",
 return
 end
 
-local h=an.validate(g)
-if h.success then
-ar:Close()()
+local f=ak.validate(d)
+if f.success then
+ap:Close()()
 task.spawn(function()
-while an.isConnected()do
+local g=aj and ak.isAuthenticated or ak.isConnected
+while g()do
 task.wait(5)
 end
 end)
 task.wait(0.4)
-ai(true,h)
+ai(true,f)
 else
-an.clearSavedKey()
+ak.clearSavedKey()
 ag.PandaUI:Notify{
 Title="Key System Error",
-Content=h.error or"Invalid key",
+Content=f.error or"Invalid key",
 Icon="triangle-alert",
 }
 end
-end,"Primary",b)
+end,"Primary",aA)
 
-g.AnchorPoint=Vector2.new(1,0.5)
-g.Position=UDim2.new(1,0,0.5,0)
+d.AnchorPoint=Vector2.new(1,0.5)
+d.Position=UDim2.new(1,0,0.5,0)
 
-ar:Open()
+ap:Open()
 end
 
 return aa end function a.o():typeof(__modImpl())local aa=a.cache.o if not aa then aa={c=__modImpl()}a.cache.o=aa end return aa.c end end do local function __modImpl()
@@ -11685,6 +11740,8 @@ aa:SetLanguage(ao.Language)
 function aa.ClearSavedKey(av)
 if aa.WilkinsInstance then
 aa.WilkinsInstance.clearSavedKey()
+elseif aa.CookiesInstance then
+aa.CookiesInstance.clearSavedKey()
 else
 local aw
 local ax
@@ -11723,6 +11780,41 @@ local aB=loadstring(az)()
 if aB and type(aB.clearSavedKey)=="function"then
 aB.clearSavedKey()
 end
+end
+end)
+end
+
+local az=request
+or http_request
+or httprequest
+or(syn and syn.request)
+or(http and http.request)
+or(fluxus and fluxus.request)
+local aA
+if az then
+local aB,b=pcall(az,{
+Url="https://secure.pandauth.com/cv4/lib",
+Method="GET"
+})
+if aB and b then
+local d=b.Body or b.body or""
+local f=b.StatusCode or b.statusCode or 0
+if f>=200 and f<300 and#d>=100 then
+aA=d
+end
+end
+end
+if not aA then
+local aB,b=pcall(game.HttpGet,game,"https://secure.pandauth.com/cv4/lib")
+if aB and typeof(b)=="string"and#b>=100 then
+aA=b
+end
+end
+if aA then
+pcall(function()
+local aB=loadstring(aA)()
+if aB and type(aB.clearSavedKey)=="function"then
+aB.clearSavedKey()
 end
 end)
 end
