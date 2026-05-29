@@ -1,0 +1,28 @@
+{
+    "name": "PandaUI",
+    "tree": {
+        "$className": "DataModel",
+
+        "ReplicatedStorage": {
+            "PandaUI": {
+                "$path": "src/"
+            },
+            "build": {
+                "$path": "build/"
+            }
+        },
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "$path": "src/server/"
+        },
+        "StarterPlayer": {
+            "$className": "StarterPlayer",
+            "StarterPlayerScripts": {
+                "$className": "StarterPlayerScripts",
+                "main": {
+                    "$path": "main2.client.lua"
+                }
+            }
+        }
+    }
+}

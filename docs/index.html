@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PandaUI — Modern Luau UI Library Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-text">Panda<span class="logo-accent">UI</span></span>
+                    <span class="version">v1.0.0</span>
+                </div>
+            </div>
+            <div class="search-box">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search components...">
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3>Getting Started</h3>
+                    <ul>
+                        <li class="active" data-target="introduction"><a href="#introduction"><i data-lucide="info"></i>Introduction</a></li>
+                        <li data-target="installation"><a href="#installation"><i data-lucide="download"></i>Installation</a></li>
+                        <li data-target="key-system"><a href="#key-system"><i data-lucide="key"></i>Wilkins Key System</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h3>Containers</h3>
+                    <ul>
+                        <li data-target="window"><a href="#window"><i data-lucide="app-window"></i>Window</a></li>
+                        <li data-target="section"><a href="#section"><i data-lucide="layout"></i>Section</a></li>
+                        <li data-target="tab"><a href="#tab"><i data-lucide="folder"></i>Tab</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h3>Basic Elements</h3>
+                    <ul>
+                        <li data-target="button"><a href="#button"><i data-lucide="play"></i>Button</a></li>
+                        <li data-target="checkbox"><a href="#checkbox"><i data-lucide="check-square"></i>Checkbox</a></li>
+                        <li data-target="code"><a href="#code"><i data-lucide="code-2"></i>Code View</a></li>
+                        <li data-target="dropdown"><a href="#dropdown"><i data-lucide="chevron-down"></i>Dropdown</a></li>
+                        <li data-target="input"><a href="#input"><i data-lucide="type"></i>Input</a></li>
+                        <li data-target="label"><a href="#label"><i data-lucide="baseline"></i>Label</a></li>
+                        <li data-target="toggle"><a href="#toggle"><i data-lucide="toggle-left"></i>Toggle</a></li>
+                        <li data-target="tooltip"><a href="#tooltip"><i data-lucide="help-circle"></i>Tooltip</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h3>Feedback & Styling</h3>
+                    <ul>
+                        <li data-target="notification"><a href="#notification"><i data-lucide="bell"></i>Notification</a></li>
+                        <li data-target="popup"><a href="#popup"><i data-lucide="message-square"></i>Popup / Dialog</a></li>
+                        <li data-target="themes"><a href="#themes"><i data-lucide="palette"></i>Themes</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+        <main class="content-area">
+            <section id="introduction" class="doc-section active-section">
+                <h1>Introduction</h1>
+                <p class="subtitle">A stunning, rich-aesthetic, and highly customizable UI library built for Roblox Luau with native support for the V4.5 Wilkins key system.</p>
+                <div class="card info-card">
+                    <div class="card-icon"><i data-lucide="sparkles"></i></div>
+                    <div class="card-content">
+                        <h4>Why choose PandaUI?</h4>
+                        <p>PandaUI provides top-tier visual performance, clean glassmorphic components, fluid animations, and absolute security integration with the self-hosted WebSocket-based V4.5 Wilkins SDK right out of the box.</p>
+                    </div>
+                </div>
+                <h2>Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i data-lucide="shield-check"></i>
+                        <h3>Native Wilkins V4.5</h3>
+                        <p>Secure WebSocket verification with per-message rolling keys, automatic saved-key flow, and kick-on-tamper protection.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i data-lucide="palette"></i>
+                        <h3>Curated Themes</h3>
+                        <p>Dozens of premium pre-built palettes (Midnight, Mellowsi, Sky, Monokai, Sakura, etc.) and complete customization control.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i data-lucide="zap"></i>
+                        <h3>Hardware Lock (HWID)</h3>
+                        <p>Built-in integration to handle and lock license keys directly to hardware profiles.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i data-lucide="smile"></i>
+                        <h3>Zero Comments</h3>
+                        <p>Super clean codebase optimized for fast compilation and memory-efficient execution in exploit runtimes.</p>
+                    </div>
+                </div>
+            </section>
+            <section id="installation" class="doc-section">
+                <h1>Installation</h1>
+                <p class="subtitle">Quickly get up and running by referencing the loadstring module in your script executor.</p>
+                <h2>Bootstrap Code</h2>
+                <p>Paste the following script at the top of your exploit injector to load PandaUI:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">local PandaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/PandaUI/main/src/Init.lua"))()
+local Window = PandaUI:CreateWindow({
+    Title = "PandaUI Hub",
+    Theme = "Dark",
+    Acrylic = true
+})</code></pre>
+                </div>
+            </section>
+            <section id="key-system" class="doc-section">
+                <h1>Wilkins Key System Integration</h1>
+                <p class="subtitle">PandaUI embeds the self-hosted V4.5 Wilkins Lua SDK so you don't have to build any validation UI or connections from scratch.</p>
+                <h2>Usage Example</h2>
+                <p>Configure the key system properties within your window configuration. You can easily make it <code>Keyless</code> or clear the saved keys programmatically.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">local PandaUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/PandaUI/main/src/Init.lua"))()
+
+local Window = PandaUI:CreateWindow({
+    Title = "Secured Hub",
+    Theme = "Dark",
+    KeySystem = {
+        ServiceId = "your-service-id-here",
+        Title = "Licensing System",
+        Note = "Please obtain a key from our dashboard link below.",
+        SaveKey = true,
+        Keyless = false,
+        Debug = false,
+        KickOnDetect = false
+    }
+})</code></pre>
+                </div>
+                <h2>Programmatic Deletion</h2>
+                <p>If you want to clear the saved license key so the user is prompted fresh on next execution, call the clear method:</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">PandaUI:ClearSavedKey()</code></pre>
+                </div>
+            </section>
+            <section id="window" class="doc-section">
+                <h1>Window</h1>
+                <p class="subtitle">The core panel container that holds tabs, buttons, section headers, search, and navigation.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">local Window = PandaUI:CreateWindow({
+    Title = "Dashboard",
+    Author = "Panda Devs",
+    Theme = "Sky",
+    Size = UDim2.new(0, 580, 0, 460),
+    Resizable = true,
+    Acrylic = true
+})</code></pre>
+                </div>
+            </section>
+            <section id="section" class="doc-section">
+                <h1>Section</h1>
+                <p class="subtitle">Groups elements together inside a tab with a clean visual header.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">local Tab = Window:AddTab({ Title = "Combat", Icon = "sword" })
+local Section = Tab:AddSection({ Title = "Aimbot Settings" })</code></pre>
+                </div>
+            </section>
+            <section id="tab" class="doc-section">
+                <h1>Tab</h1>
+                <p class="subtitle">Creates a separate view/category within the sidebar interface.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">local Tab = Window:AddTab({
+    Title = "Settings",
+    Icon = "settings"
+})</code></pre>
+                </div>
+            </section>
+            <section id="button" class="doc-section">
+                <h1>Button</h1>
+                <p class="subtitle">A basic clickable control to fire specific functions.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">Section:AddButton({
+    Title = "Reset Character",
+    Callback = function()
+        game.Players.LocalPlayer.Character:BreakJoints()
+    end
+})</code></pre>
+                </div>
+            </section>
+            <section id="checkbox" class="doc-section">
+                <h1>Checkbox</h1>
+                <p class="subtitle">A toggleable option box designed for simple state configurations.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">Section:AddCheckbox({
+    Title = "Auto-Loot Items",
+    Default = false,
+    Callback = function(value)
+        print("Auto loot set to: ", value)
+    end
+})</code></pre>
+                </div>
+            </section>
+            <section id="code" class="doc-section">
+                <h1>Code View</h1>
+                <p class="subtitle">Formats code scripts or output text with custom mono font wrapping inside the interface.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">Section:AddCode({
+    Content = "print('Hello from PandaUI!')",
+    ReadOnly = true
+})</code></pre>
+                </div>
+            </section>
+            <section id="dropdown" class="doc-section">
+                <h1>Dropdown</h1>
+                <p class="subtitle">Displays a list of options that a user can select from.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">Section:AddDropdown({
+    Title = "Select Target Mode",
+    Multi = false,
+    Options = { "Closest", "Lowest HP", "Random" },
+    Default = "Closest",
+    Callback = function(selected)
+        print("Selected mode: ", selected)
+    end
+})</code></pre>
+                </div>
+            </section>
+            <section id="input" class="doc-section">
+                <h1>Input</h1>
+                <p class="subtitle">A textbox input element allowing customized numeric or text entry.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">Section:AddInput({
+    Title = "WalkSpeed Customizer",
+    Placeholder = "Enter value...",
+    Callback = function(text)
+        print("Walking speed: ", text)
+    end
+})</code></pre>
+                </div>
+            </section>
+            <section id="label" class="doc-section">
+                <h1>Label</h1>
+                <p class="subtitle">Displays static text information or alerts within a section.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">Section:AddLabel({
+    Title = "Alert: Script is currently undetected.",
+    Type = "Info"
+})</code></pre>
+                </div>
+            </section>
+            <section id="toggle" class="doc-section">
+                <h1>Toggle</h1>
+                <p class="subtitle">Premium sliding checkbox alternative, perfect for toggling feature configurations.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">Section:AddToggle({
+    Title = "Enable Kill Aura",
+    Default = false,
+    Callback = function(state)
+        print("Kill Aura state: ", state)
+    end
+})</code></pre>
+                </div>
+            </section>
+            <section id="tooltip" class="doc-section">
+                <h1>Tooltip</h1>
+                <p class="subtitle">Displays a popover description when hovering cursor over an element.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">local Element = Section:AddButton({
+    Title = "Explode All"
+})
+Element:AddTooltip("This will trigger a server-wide explosion (requires admin).")</code></pre>
+                </div>
+            </section>
+            <section id="notification" class="doc-section">
+                <h1>Notification</h1>
+                <p class="subtitle">Sleek pop-ups in the bottom-right corner of the screen to notify user of updates/alerts.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">PandaUI:Notify({
+    Title = "Notification Title",
+    Content = "Authenticated successfully as premium!",
+    Duration = 5,
+    Icon = "shield-check"
+})</code></pre>
+                </div>
+            </section>
+            <section id="popup" class="doc-section">
+                <h1>Popup / Dialog</h1>
+                <p class="subtitle">Centered, premium floating modual requiring explicit user focus and button callback confirmation.</p>
+                <h2>API Reference</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">PandaUI:Popup({
+    Title = "Confirm Action",
+    Content = "Are you sure you want to load custom scripts?",
+    Buttons = {
+        {
+            Title = "Load",
+            Icon = "check",
+            Variant = "Primary",
+            Callback = function() print("Loading") end
+        },
+        {
+            Title = "Cancel",
+            Icon = "x",
+            Variant = "Secondary",
+            Callback = function() print("Cancelled") end
+        }
+    }
+})</code></pre>
+                </div>
+            </section>
+            <section id="themes" class="doc-section">
+                <h1>Themes</h1>
+                <p class="subtitle">Configure beautiful custom gradients, element borders, and colorways dynamically.</p>
+                <h2>Setting Theme</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">PandaUI:SetTheme("Midnight")</code></pre>
+                </div>
+                <h2>Registering a Custom Theme</h2>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">Luau</span>
+                        <button class="copy-btn"><i data-lucide="copy"></i> Copy</button>
+                    </div>
+                    <pre><code class="language-lua">PandaUI:CreateTheme("Minty", {
+    Accent = Color3.fromHex("#00f5a0"),
+    Background = Color3.fromHex("#051912"),
+    Dialog = Color3.fromHex("#082b1f"),
+    Text = Color3.fromHex("#e6fff5"),
+    Placeholder = Color3.fromHex("#3a8e72")
+})
+PandaUI:SetTheme("Minty")</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
