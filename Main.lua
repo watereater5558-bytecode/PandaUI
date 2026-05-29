@@ -2137,10 +2137,16 @@ websocket and websocket.connect
 for am,an in ipairs(al)do
 if typeof(an)=="function"then
 local ao,ap=pcall(an,"wss://secure.pandauth.com/ws?type=wilkins-lib")
-if ao and typeof(ap)=="table"and ap.OnMessage then
+if ao and(typeof(ap)=="table"or typeof(ap)=="userdata")then
+local aq=false
+pcall(function()
+aq=(ap.OnMessage~=nil)
+end)
+if aq then
 aj=an
 ak=ap
 break
+end
 end
 end
 end
@@ -11680,21 +11686,42 @@ function aa.ClearSavedKey(av)
 if aa.WilkinsInstance then
 aa.WilkinsInstance.clearSavedKey()
 else
-local aw=(WebSocket and WebSocket.connect)or(syn and syn.websocket and syn.websocket.connect)or(websocket and websocket.connect)
-if aw then
+local aw
+local ax
+local ay={
+WebSocket and WebSocket.connect,
+syn and syn.websocket and syn.websocket.connect,
+websocket and websocket.connect
+}
+for az,aA in ipairs(ay)do
+if typeof(aA)=="function"then
+local aB,b=pcall(aA,"wss://secure.pandauth.com/ws?type=wilkins-lib")
+if aB and(typeof(b)=="table"or typeof(b)=="userdata")then
+local d=false
 pcall(function()
-local ax=aw"wss://secure.pandauth.com/ws?type=wilkins-lib"
-local ay
-ax.OnMessage:Connect(function(az)
-if az and#az>0 and not ay then ay=az end
+d=(b.OnMessage~=nil)
 end)
-local az=tick()+5
-repeat task.wait(0.05)until ay or tick()>az
-ax:Close()
-if ay then
-local aA=loadstring(ay)()
-if aA and type(aA.clearSavedKey)=="function"then
-aA.clearSavedKey()
+if d then
+aw=aA
+ax=b
+break
+end
+end
+end
+end
+if ax then
+pcall(function()
+local az
+ax.OnMessage:Connect(function(aA)
+if aA and#aA>0 and not az then az=aA end
+end)
+local aA=tick()+5
+repeat task.wait(0.05)until az or tick()>aA
+pcall(function()ax:Close()end)
+if az then
+local aB=loadstring(az)()
+if aB and type(aB.clearSavedKey)=="function"then
+aB.clearSavedKey()
 end
 end
 end)

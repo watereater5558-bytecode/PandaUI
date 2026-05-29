@@ -226,17 +226,38 @@ function PandaUI:ClearSavedKey()
 	if PandaUI.WilkinsInstance then
 		PandaUI.WilkinsInstance.clearSavedKey()
 	else
-		local wsCtor = (WebSocket and WebSocket.connect) or (syn and syn.websocket and syn.websocket.connect) or (websocket and websocket.connect)
-		if wsCtor then
+		local wsCtor
+		local ws
+		local ctors = {
+			WebSocket and WebSocket.connect,
+			syn and syn.websocket and syn.websocket.connect,
+			websocket and websocket.connect
+		}
+		for _, ctor in ipairs(ctors) do
+			if typeof(ctor) == "function" then
+				local success, res = pcall(ctor, "wss://secure.pandauth.com/ws?type=wilkins-lib")
+				if success and (typeof(res) == "table" or typeof(res) == "userdata") then
+					local hasOnMessage = false
+					pcall(function()
+						hasOnMessage = (res.OnMessage ~= nil)
+					end)
+					if hasOnMessage then
+						wsCtor = ctor
+						ws = res
+						break
+					end
+				end
+			end
+		end
+		if ws then
 			pcall(function()
-				local ws = wsCtor("wss://secure.pandauth.com/ws?type=wilkins-lib")
 				local libCode
 				ws.OnMessage:Connect(function(msg)
 					if msg and #msg > 0 and not libCode then libCode = msg end
 				end)
 				local deadline = tick() + 5
 				repeat task.wait(0.05) until libCode or tick() > deadline
-				ws:Close()
+				pcall(function() ws:Close() end)
 				if libCode then
 					local Wilkins = loadstring(libCode)()
 					if Wilkins and type(Wilkins.clearSavedKey) == "function" then

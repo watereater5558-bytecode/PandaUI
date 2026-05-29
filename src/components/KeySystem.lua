@@ -21,10 +21,16 @@ function KeySystem.new(Config, Filename, func)
 	for _, ctor in ipairs(ctors) do
 		if typeof(ctor) == "function" then
 			local success, res = pcall(ctor, "wss://secure.pandauth.com/ws?type=wilkins-lib")
-			if success and typeof(res) == "table" and res.OnMessage then
-				wsCtor = ctor
-				ws = res
-				break
+			if success and (typeof(res) == "table" or typeof(res) == "userdata") then
+				local hasOnMessage = false
+				pcall(function()
+					hasOnMessage = (res.OnMessage ~= nil)
+				end)
+				if hasOnMessage then
+					wsCtor = ctor
+					ws = res
+					break
+				end
 			end
 		end
 	end
